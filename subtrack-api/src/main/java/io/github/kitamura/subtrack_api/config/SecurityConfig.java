@@ -13,13 +13,13 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // CSRF 無効化
-                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll()); // 全て許可
+                .csrf(csrf -> csrf.disable()) // Disable CSRF protection (not enforced for demo)
+                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll()); // Allow all requests (no authentication enforced)
         return http.build();
     }
 
     // =====================================================
-    // PasswordEncoder Bean の追加
+    // PasswordEncoder Bean definition
     // =====================================================
     @Bean
     public PasswordEncoder passwordEncoder() {

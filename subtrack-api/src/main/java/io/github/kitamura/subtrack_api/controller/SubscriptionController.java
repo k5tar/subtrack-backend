@@ -12,6 +12,14 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.util.List;
 
+
+/**
+ * REST controller for subscription management operations.
+ * <p>
+ * Provides endpoints for creating, updating, retrieving, and soft-deleting subscriptions, as well as viewing change history.
+ * <p>
+ * All endpoints require the X-User-Id header to identify the user.
+ */
 @RestController
 @RequestMapping("/api/subscriptions")
 @RequiredArgsConstructor
@@ -20,9 +28,12 @@ public class SubscriptionController {
     private final SubscriptionService subscriptionService;
     private static final String USER_ID_HEADER = "X-User-Id";
 
-    // =====================================================
-    // 全サブスクリプション取得（削除済み除外）
-    // =====================================================
+
+    /**
+     * Retrieve all active subscriptions for a user.
+     * @param userId User ID from X-User-Id header
+     * @return ResponseEntity with list of SubscriptionResponseDto
+     */
     @GetMapping
     public ResponseEntity<List<SubscriptionResponseDto>> getAll(
             @RequestHeader(USER_ID_HEADER) Long userId) {
@@ -30,21 +41,30 @@ public class SubscriptionController {
         return ResponseEntity.ok(subscriptions);
     }
 
-    // =====================================================
-    // 登録
-    // =====================================================
-    @PostMapping
-    public ResponseEntity<SubscriptionHistoryResponseDto> create(
+
+        /**
+         * Create a new subscription for a user.
+         * @param userId User ID from X-User-Id header
+         * @param request SubscriptionRequestDto with subscription details
+         * @return ResponseEntity with created SubscriptionHistoryResponseDto
+         */
+        @PostMapping
+        public ResponseEntity<SubscriptionHistoryResponseDto> create(
             @RequestHeader(USER_ID_HEADER) Long userId,
             @Valid @RequestBody SubscriptionRequestDto request) {
         SubscriptionHistoryResponseDto created = subscriptionService.create(userId, request);
         return ResponseEntity.created(URI.create("/api/subscriptions/" + created.getSubscriptionId()))
-                .body(created);
-    }
+            .body(created);
+        }
 
-    // =====================================================
-    // 更新
-    // =====================================================
+
+    /**
+     * Update an existing subscription for a user.
+     * @param userId User ID from X-User-Id header
+     * @param id Subscription ID
+     * @param request SubscriptionRequestDto with updated details
+     * @return ResponseEntity with updated SubscriptionHistoryResponseDto
+     */
     @PutMapping("/{id}")
     public ResponseEntity<SubscriptionHistoryResponseDto> update(
             @RequestHeader(USER_ID_HEADER) Long userId,
@@ -55,7 +75,7 @@ public class SubscriptionController {
     }
 
     // =====================================================
-    // 論理削除
+    // Soft delete subscription (logical deletion)
     // =====================================================
     @DeleteMapping("/{id}")
     public ResponseEntity<SubscriptionHistoryResponseDto> delete(
@@ -66,7 +86,7 @@ public class SubscriptionController {
     }
 
     // =====================================================
-    // 履歴取得
+    // Retrieve subscription change history
     // =====================================================
     @GetMapping("/history")
     public ResponseEntity<List<SubscriptionHistoryResponseDto>> getHistory(

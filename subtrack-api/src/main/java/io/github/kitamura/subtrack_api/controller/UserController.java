@@ -13,6 +13,14 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.util.List;
 
+
+/**
+ * REST controller for user management operations.
+ * <p>
+ * Provides endpoints for user registration, retrieval, and soft deletion.
+ * <p>
+ * All responses use UserDto for data transfer.
+ */
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
@@ -20,9 +28,12 @@ public class UserController {
 
     private final UserService userService;
 
-    // =====================================================
-    // ユーザー登録
-    // =====================================================
+
+    /**
+     * Register a new user.
+     * @param request CreateUserRequest containing email, name, and password
+     * @return ResponseEntity with created UserDto and location header
+     */
     @PostMapping
     public ResponseEntity<UserDto> createUser(@RequestBody @Valid CreateUserRequest request) {
         UserDto created = userService.createUser(request.getEmail(), request.getName(), request.getPassword());
@@ -30,27 +41,35 @@ public class UserController {
                 .body(created);
     }
 
-    // =====================================================
-    // 全ユーザー取得（論理削除除外）
-    // =====================================================
+
+    /**
+     * Retrieve all active users (excluding soft-deleted).
+     * @return ResponseEntity with list of UserDto
+     */
     @GetMapping
     public ResponseEntity<List<UserDto>> getAllUsers() {
         List<UserDto> users = userService.getAllActiveUsers();
         return ResponseEntity.ok(users);
     }
 
-    // =====================================================
-    // 特定ユーザー取得（論理削除除外）
-    // =====================================================
+
+    /**
+     * Retrieve a specific active user by ID.
+     * @param id User ID
+     * @return ResponseEntity with UserDto
+     */
     @GetMapping("/{id}")
     public ResponseEntity<UserDto> getUserById(@PathVariable("id") Long id) {
         UserDto user = userService.getActiveUserById(id);
         return ResponseEntity.ok(user);
     }
 
-    // =====================================================
-    // ユーザー削除（論理削除）
-    // =====================================================
+
+    /**
+     * Soft delete a user by ID.
+     * @param id User ID
+     * @return ResponseEntity with no content
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable("id") Long id) {
         userService.deleteUser(id);

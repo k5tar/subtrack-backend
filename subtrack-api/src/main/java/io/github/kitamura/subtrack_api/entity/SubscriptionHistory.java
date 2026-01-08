@@ -12,6 +12,13 @@ import org.hibernate.type.SqlTypes;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+/**
+ * Entity representing a change history record for a subscription.
+ * <p>
+ * Tracks changes (insert, update, delete) to subscriptions, including previous and new values.
+ * <p>
+ * Mapped to the 'subscription_history' table in the database.
+ */
 @Entity
 @Table(name = "subscription_history")
 @Data

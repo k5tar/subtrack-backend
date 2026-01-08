@@ -9,6 +9,15 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Entity representing a user in the Subtrack system.
+ * <p>
+ * Users can register, manage subscriptions, and are subject to soft deletion.
+ * <p>
+ * Mapped to the 'users' table in the database.
+ * <p>
+ * See HELP.md for validation rules and error handling related to users.
+ */
 @Entity
 @Table(name = "users")
 @Data

@@ -11,10 +11,19 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+/**
+ * Entity representing a SaaS subscription for a user.
+ * <p>
+ * Includes details such as name, price, billing cycle, next payment date, and category.
+ * <p>
+ * Mapped to the 'subscriptions' table in the database.
+ * <p>
+ * See HELP.md for validation rules and error handling related to subscriptions.
+ */
 @Entity
 @Table(
-        name = "subscriptions",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "name"})
+    name = "subscriptions",
+    uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "name"})
 )
 @Data
 @NoArgsConstructor

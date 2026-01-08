@@ -32,7 +32,7 @@ public class SubscriptionService {
     private final ObjectMapper objectMapper;
 
     // =====================================================
-    // サブスクリプション取得（論理削除除外）
+    // Retrieve active subscriptions (excluding logically deleted)
     // =====================================================
     @Transactional(readOnly = true)
     public List<SubscriptionResponseDto> findAllByUserId(Long userId) {
@@ -44,7 +44,7 @@ public class SubscriptionService {
     }
 
     // =====================================================
-    // 登録
+    // Create new subscription
     // =====================================================
     @Transactional
     public SubscriptionHistoryResponseDto create(Long userId, SubscriptionRequestDto request) {
@@ -53,14 +53,14 @@ public class SubscriptionService {
         User user = userRepository.findActiveById(userId)
                 .orElseThrow(() -> new CustomException("User not found or deleted: " + userId));
 
-        // map to entity
+        // Map request DTO to entity
         Subscription entity = SubscriptionMapper.toEntity(request, user);
         entity.setDeleted(false);
 
         try {
             Subscription saved = subscriptionRepository.save(entity);
 
-            // history: previous=null, current=saved
+            // Save history: previous=null, current=saved
             SubscriptionHistory history = saveHistory(saved, user, null, saved, "INSERT");
             return SubscriptionHistoryResponseDto.of(saved, history);
         } catch (DataIntegrityViolationException e) {
@@ -73,7 +73,7 @@ public class SubscriptionService {
     }
 
     // =====================================================
-    // 更新（論理削除済みは対象外）
+    // Update subscription (excluding logically deleted)
     // =====================================================
     @Transactional
     public SubscriptionHistoryResponseDto update(Long userId, Long subscriptionId, SubscriptionRequestDto request) {
@@ -90,6 +90,7 @@ public class SubscriptionService {
             throw new CustomException("Subscription not found for user: " + subscriptionId);
         }
 
+        // Clone current subscription for history tracking
         Subscription before = cloneSubscription(existing);
 
         SubscriptionMapper.updateEntityFromDto(request, existing);
@@ -108,7 +109,7 @@ public class SubscriptionService {
     }
 
     // =====================================================
-    // 削除（論理削除）
+    // Delete subscription (logical deletion)
     // =====================================================
     @Transactional
     public SubscriptionHistoryResponseDto delete(Long userId, Long subscriptionId) {
@@ -125,20 +126,20 @@ public class SubscriptionService {
             throw new CustomException("Subscription not found for user: " + subscriptionId);
         }
 
-        // snapshot before deletion
+        // Snapshot before deletion for history
         Subscription before = cloneSubscription(existing);
 
-        // mark deleted and persist
+        // Mark as deleted and persist
         existing.setDeleted(true);
         Subscription saved = subscriptionRepository.save(existing);
 
-        // save history: record before (active state) and after (deleted=true)
+        // Save history: record before (active state) and after (deleted=true)
         SubscriptionHistory history = saveHistory(saved, saved.getUser(), before, saved, "DELETE");
         return SubscriptionHistoryResponseDto.of(saved, history);
     }
 
     // =====================================================
-    // 履歴取得
+    // Retrieve subscription history
     // =====================================================
     @Transactional(readOnly = true)
     public List<SubscriptionHistoryResponseDto> getHistoryByUserId(Long userId) {
@@ -154,8 +155,8 @@ public class SubscriptionService {
     }
 
     // =====================================================
-    // 内部処理: 履歴登録
-    //  - previous/current は DTO に変換して JSON 化（エンティティのまま直列化しない）
+    // Internal process: Save history
+    //  - previous/current are converted to DTO and serialized as JSON (do not serialize entity directly)
     // =====================================================
     private SubscriptionHistory saveHistory(Subscription subscription, User user,
                                             Subscription previous, Subscription current, String actionType) {
@@ -190,7 +191,7 @@ public class SubscriptionService {
     }
 
     // =====================================================
-    // 内部処理: Subscriptionクローン（スナップショット）
+    // Internal process: Clone Subscription (snapshot)
     // =====================================================
     private Subscription cloneSubscription(Subscription original) {
         if (original == null) return null;

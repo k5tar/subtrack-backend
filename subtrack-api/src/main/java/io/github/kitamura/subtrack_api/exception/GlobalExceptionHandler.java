@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     // =====================================================
-    // CustomException
+    // Handle CustomException (application-specific errors)
     // =====================================================
     @ExceptionHandler(CustomException.class)
     protected ResponseEntity<ErrorResponse> handleCustomException(CustomException ex) {
@@ -26,7 +26,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     // =====================================================
-    // IllegalArgumentException
+    // Handle IllegalArgumentException (bad request errors)
     // =====================================================
     @ExceptionHandler(IllegalArgumentException.class)
     protected ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException ex) {
@@ -35,7 +35,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     // =====================================================
-    // ConstraintViolationException (Validation)
+    // Handle ConstraintViolationException (validation errors)
     // =====================================================
     @ExceptionHandler(ConstraintViolationException.class)
     protected ResponseEntity<ErrorResponse> handleConstraintViolation(ConstraintViolationException ex) {
@@ -47,7 +47,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     // =====================================================
-    // MethodArgumentNotValidException (RequestBody Validation)
+    // Handle MethodArgumentNotValidException (request body validation errors)
     // =====================================================
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
@@ -64,7 +64,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     // =====================================================
-    // その他の全例外
+    // Handle all other exceptions (internal errors)
     // =====================================================
     @ExceptionHandler(Exception.class)
     protected ResponseEntity<ErrorResponse> handleAll(Exception ex) {
